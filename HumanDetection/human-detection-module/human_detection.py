@@ -13,7 +13,6 @@ from kombu.mixins import ConsumerMixin
 import datetime
 import os
 import glob
-import redis
 
 
 # Kombu Message Consuming Human_Detection_Worker
@@ -111,8 +110,8 @@ class Human_Detection_Worker(ConsumerMixin):
     def create_database_entry(self, camera_id, frame_id, num_humans, ts):
         num_humans_key = f"camera_{camera_id}_frame_{frame_id}_n_humans"
         timestamp_key = f"camera_{camera_id}_frame_{frame_id}_timestamp"
-        self.database.set(num_humans_key,num_humans)
-        self.database.set(timestamp_key,ts)
+        self.database[num_humans_key] = num_humans
+        self.database[timestamp_key] = ts
 
 
     def alarm_if_needed(self, camera_id, frame_id):
@@ -120,13 +119,13 @@ class Human_Detection_Worker(ConsumerMixin):
         prev1_n_human_key = f"camera_{camera_id}_frame_{frame_id-1}_n_humans"
         prev2_n_human_key = f"camera_{camera_id}_frame_{frame_id-2}_n_humans"
 
-        prev1_frame_n_humans = int(self.database.get(prev1_n_human_key)) if self.database.exists(prev1_n_human_key) else 0
-        curr_frame_n_humans = int(self.database.get(n_human_key)) if self.database.exists(n_human_key) else 0
-        prev2_frame_n_humans = int(self.database.get(prev2_n_human_key)) if self.database.exists(prev2_n_human_key) else 0
+        prev1_frame_n_humans = self.database.get(prev1_n_human_key, 0)
+        curr_frame_n_humans = self.database.get(n_human_key, 0)
+        prev2_frame_n_humans = self.database.get(prev2_n_human_key, 0)
 
         if prev1_frame_n_humans + curr_frame_n_humans + prev2_frame_n_humans >= 3:
             timestamp_key = f"camera_{camera_id}_frame_{frame_id}_timestamp"
-            timestamp = self.database.get(timestamp_key)
+            timestamp = self.database.get(timestamp_key, "")
             print(f"[!!!] INTRUDER DETECTED AT TIMESTAMP {timestamp}[!!!]")
             return True
         return False
@@ -135,12 +134,9 @@ class Human_Detection_Worker(ConsumerMixin):
 class Human_Detection_Module:
 
     def __init__(self, output_dir):
-        self.database = self.init_database()
+        self.database = {}
         self.output_dir = output_dir
         self.__bootstrap_output_directory()
-
-    def init_database(self):
-        return redis.Redis(host='localhost',port=6379, charset="utf-8", decode_responses=True)
 
     def __bootstrap_output_directory(self):
         if os.path.isdir(self.output_dir):
@@ -178,35 +174,6 @@ class Human_Detection_Module:
         )
 
         # Start Human Detection Workers
-
-        """
-        Idea to turn the HDM scalable.
-        When the frame rate of the received messages increases, then create more workers to process the frames.
-        Initially, when this value is low one worker can process all the information
-        However, when this is not the case, each worker should update its HDM results to the database and the 3rd one should check if there are humans in the last frames
-
-        Difficulties:
-        How each of them connects to the database (redis)
-        How to dynamically create/destroy workers
-        Which worker is the responsible for human intrusion detection?
-
-
-
-
-        check_if_need_workers()
-
-        [Human_Detection_Worker(
-            connection=self.kombu_connection,
-            queues=self.kombu_queues,
-            database=self.database,
-            output_dir=self.output_dir
-        )
-        for i in range(num_of_needed_workers()
-        )]
-
-        """
-
-
         self.human_detection_worker = Human_Detection_Worker(
             connection=self.kombu_connection,
             queues=self.kombu_queues,

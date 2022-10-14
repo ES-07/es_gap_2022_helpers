@@ -113,7 +113,6 @@ class Camera:
                     print(f"[Camera {self.camera_id}] Sent a frame to " +
                           "the human-detection module " +
                           f"(frame_number={frame_count}, " +
-                          f"(frame_id={frame_id}" + 
                           f"frame_timestamp={time_now})")
 
                     frame_id += 1
