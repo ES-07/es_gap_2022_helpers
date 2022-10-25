@@ -14,10 +14,15 @@ import datetime
 import os
 import glob
 import redis
+import requests
+import time
+import send_frames
 
+BASE_URL = "http://localhost:8000"
 
 # Kombu Message Consuming Human_Detection_Worker
 class Human_Detection_Worker(ConsumerMixin):
+
 
     def __init__(self, connection, queues, database, output_dir):
         self.connection = connection
@@ -26,6 +31,24 @@ class Human_Detection_Worker(ConsumerMixin):
         self.output_dir = output_dir
         self.HOGCV = cv2.HOGDescriptor()
         self.HOGCV.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+        
+        
+        # turn our message broker on to send data
+        RABBIT_MQ_URL = "localhost:5672"
+        RABBIT_MQ_USERNAME = "myuser"
+        RABBIT_MQ_PASSWORD = "mypassword"
+        RABBIT_MQ_EXCHANGE_NAME = "human-detection-exchange"
+        RABBIT_MQ_QUEUE_NAME = "intrusion-api-queue"
+        self.messageQueueIntrusionApi = send_frames.SendFrames()
+        self.messageQueueIntrusionApi.attach_to_message_broker(
+            RABBIT_MQ_URL, 
+            RABBIT_MQ_USERNAME, 
+            RABBIT_MQ_PASSWORD, 
+            RABBIT_MQ_EXCHANGE_NAME, 
+            RABBIT_MQ_QUEUE_NAME
+        )
+
+
 
 
     def detect_number_of_humans(self, frame):
@@ -125,8 +148,15 @@ class Human_Detection_Worker(ConsumerMixin):
         prev2_frame_n_humans = int(self.database.get(prev2_n_human_key)) if self.database.exists(prev2_n_human_key) else 0
 
         if prev1_frame_n_humans + curr_frame_n_humans + prev2_frame_n_humans >= 3:
+            # aqui ele vai comunicar com a api de intrusão
+            total_n_humans = prev1_frame_n_humans + curr_frame_n_humans + prev2_frame_n_humans
             timestamp_key = f"camera_{camera_id}_frame_{frame_id}_timestamp"
             timestamp = self.database.get(timestamp_key)
+
+            # send to message broker
+            self.messageQueueIntrusionApi.send_notification(timestamp=time.time(), camera_id=camera_id, frame_id=frame_id)
+            
+            
             print(f"[!!!] INTRUDER DETECTED AT TIMESTAMP {timestamp}[!!!]")
             return True
         return False

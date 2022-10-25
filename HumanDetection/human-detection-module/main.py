@@ -27,3 +27,4 @@ human_detection_worker.start_processing(
     exchange_name=RABBIT_MQ_EXCHANGE_NAME,
     queue_name=RABBIT_MQ_QUEUE_NAME
     )
+
