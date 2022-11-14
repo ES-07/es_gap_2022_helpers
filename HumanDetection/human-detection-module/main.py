@@ -5,15 +5,29 @@
 # @Last Modified by:   Rafael Direito
 # @Last Modified time: 2022-10-07 11:34:30
 
+import os
 
+
+from dotenv import load_dotenv
+from pathlib import Path
 from human_detection import Human_Detection_Module
 
-# AMQP Variables
+# Load environment variables
+dotenv_path = Path('../.env')
+load_dotenv(dotenv_path=dotenv_path)
+
+
+RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL')
+RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
+RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
+RABBIT_MQ_EXCHANGE_NAME = os.getenv('RABBIT_MQ_EXCHANGE_NAME')
+RABBIT_MQ_QUEUE_NAME = os.getenv('RABBIT_MQ_QUEUE_NAME')
+
+# Comment these lines to use AWS Broker
 RABBIT_MQ_URL = "localhost:5672"
 RABBIT_MQ_USERNAME = "myuser"
 RABBIT_MQ_PASSWORD = "mypassword"
-RABBIT_MQ_EXCHANGE_NAME = "human-detection-exchange"
-RABBIT_MQ_QUEUE_NAME = "human-detection-queue"
+
 
 # OUTPUT
 OUTPUT_DIR = "intruders"

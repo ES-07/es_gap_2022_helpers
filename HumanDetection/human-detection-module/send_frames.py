@@ -36,16 +36,22 @@ class SendFrames:
         self.kombu_producer = kombu.Producer(
             exchange=self.kombu_exchange,
             channel=self.kombu_channel,
-            routing_key=queue_name
+            routing_key=queue_name,
+            serializer="json"
         )
 
 
     def send_notification(self, timestamp, camera_id, frame_id):
+        strToSend = '"timestamp": "{}", "camera_id": "{}", "frame_id": {}'.format(str(timestamp), str(camera_id), frame_id)
+        
         self.kombu_producer.publish(
-            body=json.dumps("{timestamp: "+str(timestamp)+
-            ", camera_id: "+str(camera_id)+
-            ", frame_id: "+str(frame_id)+"}"
-            ),
+            body=json.dumps('{'+strToSend+'}'),
+        )
+
+    def send_frame(self, timestamp, camera_id, frame_id, frames):
+        strToSend = '"timestamp": "{}", "camera_id": "{}", "frame_id": {}, "frames": "{}"'.format(timestamp, camera_id, frame_id, frames)
+        self.kombu_producer.publish(
+            body=json.dumps('{'+strToSend+'}'),
         )
 
 
