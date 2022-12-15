@@ -19,14 +19,9 @@ load_dotenv(dotenv_path=dotenv_path)
 RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL')
 RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
 RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
-
-
-# Comment these lines to use AWS Broker
-RABBIT_MQ_URL = "localhost:5672"
-RABBIT_MQ_USERNAME = "myuser"
-RABBIT_MQ_PASSWORD = "mypassword"
 RABBIT_MQ_EXCHANGE_NAME = "video-exchange"
 RABBIT_MQ_QUEUE_NAME = "video-queue"
+
 
 class VideoProducer:
 
@@ -39,11 +34,15 @@ class VideoProducer:
         self.frames_per_second_to_process = 2
 
     def createConnection(self):
-        self.conn = kombu.Connection(f"amqp://{self.username}:{self.password}@{self.rabbitUrl}//")
+        self.conn = kombu.Connection(
+            f"amqp://{self.username}:{self.password}@{self.rabbitUrl}//", ssl=True)
         self.channel = self.conn.channel()
-        self.exchange = kombu.Exchange("video-exchange", type="direct", delivery_mode=1)
-        self.kombu_producer = kombu.Producer(exchange=self.exchange, channel=self.channel, routing_key="video")
-        self.queue = kombu.Queue(name=self.queueName, exchange=self.exchange, routing_key="video") 
+        self.exchange = kombu.Exchange(
+            "video-exchange", type="direct", delivery_mode=1)
+        self.kombu_producer = kombu.Producer(
+            exchange=self.exchange, channel=self.channel, routing_key="video")
+        self.queue = kombu.Queue(
+            name=self.queueName, exchange=self.exchange, routing_key="video")
         self.queue.maybe_bind(self.conn)
         self.queue.declare()
 
@@ -91,7 +90,7 @@ class VideoProducer:
                         content_encoding='binary',
                         headers={
                             "source": f"camera_1"
-                            }
+                        }
                     )
 
                     frame_id += 1
@@ -99,16 +98,14 @@ class VideoProducer:
             else:
                 self.kombu_producer.publish(
                     content_type='application/json',
-                    body=json.dumps({"end":"True"})
+                    body=json.dumps({"end": "True"})
                 )
                 break
 
             frame_count += 1
-        
+
 
 app = fastapi.FastAPI()
-
-
 
 
 @app.get("/video")
@@ -117,6 +114,7 @@ def sendVideo(start: int, end: int):
         videoProducer = VideoProducer()
         videoProducer.createConnection()
         videoProducer.processVideo("samples/people-detection.mp4")
-        
+
     else:
-        raise fastapi.HTTPException(status_code=400, detail="start must be less than end")
+        raise fastapi.HTTPException(
+            status_code=400, detail="start must be less than end")

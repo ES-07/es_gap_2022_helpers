@@ -23,7 +23,6 @@ class Camera:
         self.camera_id = camera_id
         self.frames_per_second_to_process = frames_per_second_to_process
 
-
     def attach_to_message_broker(self, broker_url, broker_username,
                                  broker_password, exchange_name, queue_name):
         # Create Connection String
@@ -32,7 +31,7 @@ class Camera:
 
         # Kombu Connection
         #self.kombu_connection = kombu.Connection(connection_string, ssl=True)
-        self.kombu_connection = kombu.Connection(connection_string)
+        self.kombu_connection = kombu.Connection(connection_string, ssl=True)
         self.kombu_channel = self.kombu_connection.channel()
 
         # Kombu Exchange
@@ -55,7 +54,6 @@ class Camera:
         )
         self.kombu_queue.maybe_bind(self.kombu_connection)
         self.kombu_queue.declare()
-
 
     def transmit_video(self, video_path):
         video = cv2.VideoCapture(video_path)
@@ -108,18 +106,18 @@ class Camera:
                             "source": f"camera_{self.camera_id}",
                             "timestamp": str(time_now),
                             "frame_count": frame_count,
-                            "frame_id": frame_id                        
-                            }
+                            "frame_id": frame_id
+                        }
                     )
                     print(f"[Camera {self.camera_id}] Sent a frame to " +
                           "the human-detection module " +
                           f"(frame_number={frame_count}, " +
-                          f"(frame_id={frame_id}" + 
+                          f"(frame_id={frame_id}" +
                           f"frame_timestamp={time_now})")
 
                     frame_id += 1
                     #key = cv2.waitKey(1)
-                    #if key == ord('q'):
+                    # if key == ord('q'):
                     #    break
             else:
                 break
