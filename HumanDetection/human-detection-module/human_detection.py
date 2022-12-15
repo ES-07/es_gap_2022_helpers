@@ -30,7 +30,7 @@ RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
 RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
 
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://13.38.41.16:8001/"
 
 # Kombu Message Consuming Human_Detection_Worker
 
@@ -180,7 +180,7 @@ class Human_Detection_Module:
         self.__bootstrap_output_directory()
 
     def init_database(self):
-        return redis.Redis(host='localhost', port=6379, charset="utf-8", decode_responses=True)
+        return redis.Redis(host='redis-hdm.l3lcvy.ng.0001.euw3.cache.amazonaws.com', port=6379, charset="utf-8", decode_responses=True)
 
     def __bootstrap_output_directory(self):
         if os.path.isdir(self.output_dir):
@@ -196,7 +196,6 @@ class Human_Detection_Module:
         # Create Connection String
         connection_string = f"amqp://{broker_username}:{broker_password}" \
             f"@{broker_url}/"
-
         # Kombu Exchange
         self.kombu_exchange = kombu.Exchange(
             name=exchange_name,
@@ -246,7 +245,6 @@ class Human_Detection_Module:
         )]
 
         """
-        print(connection_string)
         self.human_detection_worker = Human_Detection_Worker(
             connection=self.kombu_connection,
             queues=self.kombu_queues,
