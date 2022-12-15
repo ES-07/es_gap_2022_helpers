@@ -13,7 +13,7 @@ from pathlib import Path
 from human_detection import Human_Detection_Module
 
 # Load environment variables
-dotenv_path = Path('../.env')
+dotenv_path = Path('.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 
