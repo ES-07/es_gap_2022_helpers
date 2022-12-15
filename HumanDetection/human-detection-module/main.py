@@ -5,23 +5,15 @@
 # @Last Modified by:   Rafael Direito
 # @Last Modified time: 2022-10-07 11:34:30
 
-import os
 
-
-from dotenv import load_dotenv
-from pathlib import Path
 from human_detection import Human_Detection_Module
 
-# Load environment variables
-dotenv_path = Path('.env')
-load_dotenv(dotenv_path=dotenv_path)
 
-
-RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL')
-RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
-RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
-RABBIT_MQ_EXCHANGE_NAME = os.getenv('RABBIT_MQ_EXCHANGE_NAME')
-RABBIT_MQ_QUEUE_NAME = os.getenv('RABBIT_MQ_QUEUE_NAME')
+RABBIT_MQ_USERNAME = "myuser"
+RABBIT_MQ_PASSWORD = "mypassword2000"
+RABBIT_MQ_URL = "b-750c2b74-4dab-4777-9001-13d3a41d77c8.mq.eu-west-3.amazonaws.com:5671"
+RABBIT_MQ_EXCHANGE_NAME = "human-detection-exchange"
+RABBIT_MQ_QUEUE_NAME = "human-detection-queue"
 
 
 # OUTPUT

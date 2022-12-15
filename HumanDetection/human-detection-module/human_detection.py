@@ -18,16 +18,10 @@ import requests
 import time
 import datetime
 
-from dotenv import load_dotenv
-from pathlib import Path
 
-
-dotenv_path = Path('.env')
-load_dotenv(dotenv_path=dotenv_path)
-
-RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL')
-RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
-RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
+RABBIT_MQ_URL = "b-750c2b74-4dab-4777-9001-13d3a41d77c8.mq.eu-west-3.amazonaws.com: 5671"
+RABBIT_MQ_USERNAME = "myuser"
+RABBIT_MQ_PASSWORD = "mypassword2000"
 
 
 BASE_URL = "http://13.38.41.16:8001/"
