@@ -23,11 +23,6 @@ RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
 RABBIT_MQ_EXCHANGE_NAME = os.getenv('RABBIT_MQ_EXCHANGE_NAME')
 RABBIT_MQ_QUEUE_NAME = os.getenv('RABBIT_MQ_QUEUE_NAME')
 
-# Comment these lines to use AWS Broker
-RABBIT_MQ_URL = "localhost:5672"
-RABBIT_MQ_USERNAME = "myuser"
-RABBIT_MQ_PASSWORD = "mypassword"
-
 
 # OUTPUT
 OUTPUT_DIR = "intruders"
@@ -40,5 +35,4 @@ human_detection_worker.start_processing(
     broker_password=RABBIT_MQ_PASSWORD,
     exchange_name=RABBIT_MQ_EXCHANGE_NAME,
     queue_name=RABBIT_MQ_QUEUE_NAME
-    )
-
+)
