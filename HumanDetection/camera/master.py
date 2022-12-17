@@ -1,6 +1,6 @@
 import fastapi
 import os
-import responses
+#import responses
 import pydantic
 import kombu
 import cv2
@@ -13,14 +13,14 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 
-dotenv_path = Path('../.env')
+dotenv_path = Path('.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL')
 RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
 RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
-RABBIT_MQ_EXCHANGE_NAME = "video-exchange"
-RABBIT_MQ_QUEUE_NAME = "video-queue"
+RABBIT_MQ_EXCHANGE_NAME = os.getenv('RABBIT_MQ_EXCHANGE_NAME')
+RABBIT_MQ_QUEUE_NAME = os.getenv('RABBIT_MQ_QUEUE_NAME')
 
 
 class VideoProducer:
