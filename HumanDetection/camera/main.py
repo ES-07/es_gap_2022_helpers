@@ -20,11 +20,13 @@ load_dotenv(dotenv_path=dotenv_path)
 
 
 def get_random_device_id(api_url):
+    print(api_url)
     response = requests.get(f"{api_url}/devices")
     if response.status_code == 200:
         devices = response.json()
         return devices[random.randint(0, len(devices) - 1)]['id']
     return None
+
 
 SITES_MANAGEMENT_API_URL = os.getenv('SITES_MANAGEMENT_API_URL')
 # CAMERA VARIABLES

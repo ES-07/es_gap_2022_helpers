@@ -24,8 +24,8 @@ RABBIT_MQ_USERNAME = "myuser"
 RABBIT_MQ_PASSWORD = "mypassword2000"
 
 
-INTRUSIONS_API_URL = "http://localhost:8002/"
-SITES_MANAGEMENT_API_URL = "http://localhost:8000/"
+INTRUSIONS_API_URL = "http://localhost:8000"
+SITES_MANAGEMENT_API_URL = "http://localhost:8002"
 
 # Kombu Message Consuming Human_Detection_Worker
 
@@ -155,14 +155,17 @@ class Human_Detection_Worker(ConsumerMixin):
             timestamp = int(time.mktime(datetime.datetime.strptime(
                 timestamp, "%Y-%m-%d %H:%M:%S.%f").timetuple()))
             # if timestamp > 3*60 + self.lastIntrusion:
-            #self.lastIntrusion = timestamp
+            # self.lastIntrusion = timestamp
 
             # send to intrusion api
-            device = requests.get(SITES_MANAGEMENT_API_URL + '/devices' + '/' + str(camera_id.split("_")[1])).json
-            print(device)
+            device_response = requests.get(
+                SITES_MANAGEMENT_API_URL + '/devices' + '/' + str(camera_id.split("_")[1]))
+
+            building_id = device_response.json()["building_id"]
+            device_id = int(camera_id.split("_")[1])
+
             response = requests.post(INTRUSIONS_API_URL+'/intrusions', json={'timestamp': str(
-                timestamp), 'building_id': 1, 'device_id': int(camera_id.split("_")[1])})
-            print("--------> ", response)
+                timestamp), 'building_id': building_id, 'device_id': device_id})
 
             print(f"[!!!] INTRUDER DETECTED AT TIMESTAMP {timestamp}[!!!]")
             return True
@@ -177,7 +180,7 @@ class Human_Detection_Module:
         self.__bootstrap_output_directory()
 
     def init_database(self):
-        return redis.Redis(host='redis-hdm.l3lcvy.ng.0001.euw3.cache.amazonaws.com', port=6379, charset="utf-8", decode_responses=True)
+        return redis.Redis(host='localhost', port=6379, charset="utf-8", decode_responses=True)
 
     def __bootstrap_output_directory(self):
         if os.path.isdir(self.output_dir):
