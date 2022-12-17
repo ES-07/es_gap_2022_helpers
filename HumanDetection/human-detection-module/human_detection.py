@@ -39,7 +39,7 @@ class Human_Detection_Worker(ConsumerMixin):
         self.output_dir = output_dir
         self.HOGCV = cv2.HOGDescriptor()
         self.HOGCV.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-        self.b = True
+        self.lastCameraId = -5
 
     def detect_number_of_humans(self, frame):
         bounding_box_cordinates, _ = self.HOGCV.detectMultiScale(
@@ -144,9 +144,8 @@ class Human_Detection_Worker(ConsumerMixin):
         prev2_frame_n_humans = int(self.database.get(
             prev2_n_human_key)) if self.database.exists(prev2_n_human_key) else 0
 
-        if prev1_frame_n_humans + curr_frame_n_humans + prev2_frame_n_humans >= 3 and self.b:
+        if prev1_frame_n_humans + curr_frame_n_humans + prev2_frame_n_humans >= 3 and self.lastCameraId != int(camera_id.split("_")[1]):
             # aqui ele vai comunicar com a api de intrusão
-            self.b = False
             total_n_humans = prev1_frame_n_humans + \
                 curr_frame_n_humans + prev2_frame_n_humans
             timestamp_key = f"camera_{camera_id}_frame_{frame_id}_timestamp"
@@ -163,6 +162,7 @@ class Human_Detection_Worker(ConsumerMixin):
 
             building_id = device_response.json()["building_id"]
             device_id = int(camera_id.split("_")[1])
+            self.lastCameraId = device_id
 
             response = requests.post(INTRUSIONS_API_URL+'/intrusions', json={'timestamp': str(
                 timestamp), 'building_id': building_id, 'device_id': device_id})
