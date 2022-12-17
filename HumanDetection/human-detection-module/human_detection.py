@@ -24,7 +24,8 @@ RABBIT_MQ_USERNAME = "myuser"
 RABBIT_MQ_PASSWORD = "mypassword2000"
 
 
-BASE_URL = "http://13.38.41.16:8001/"
+INTRUSIONS_API_URL = "http://localhost:8002/"
+SITES_MANAGEMENT_API_URL = "http://localhost:8000/"
 
 # Kombu Message Consuming Human_Detection_Worker
 
@@ -157,7 +158,9 @@ class Human_Detection_Worker(ConsumerMixin):
             #self.lastIntrusion = timestamp
 
             # send to intrusion api
-            response = requests.post(BASE_URL+'/intrusions', json={'timestamp': str(
+            device = requests.get(SITES_MANAGEMENT_API_URL + '/devices' + '/' + str(camera_id.split("_")[1])).json
+            print(device)
+            response = requests.post(INTRUSIONS_API_URL+'/intrusions', json={'timestamp': str(
                 timestamp), 'building_id': 1, 'device_id': int(camera_id.split("_")[1])})
             print("--------> ", response)
 
