@@ -5,17 +5,15 @@
 # @Last Modified by:   Rafael Direito
 # @Last Modified time: 2022-10-05 18:26:15 (WEST)
 
-
 version: "3.8"
 services:
-    rabbitmq3:
-        container_name: "rabbitmq"
-        image: rabbitmq:3.8-management-alpine
-        environment:
-            - RABBITMQ_DEFAULT_USER=myuser
-            - RABBITMQ_DEFAULT_PASS=mypassword
-        ports:
-            # AMQP protocol port
-            - '5672:5672'
-            # HTTP management UI
-            - '15672:15672'
+  rabbitmq3:
+    container_name: "cameras-container"
+    env_file:
+      - camera/.env
+    args:
+    RABBIT_MQ_USERNAME: ${RABBIT_MQ_USERNAME}
+    RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
+    RABBIT_MQ_URL: ${RABBIT_MQ_URL}
+    RABBIT_MQ_EXCHANGE_NAME: ${RABBIT_MQ_EXCHANGE_NAME}
+    RABBIT_MQ_QUEUE_NAME: ${RABBIT_MQ_QUEUE_NAME}
