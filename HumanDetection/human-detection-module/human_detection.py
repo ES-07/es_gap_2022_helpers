@@ -19,13 +19,13 @@ import time
 import datetime
 
 
-RABBIT_MQ_URL = "b-750c2b74-4dab-4777-9001-13d3a41d77c8.mq.eu-west-3.amazonaws.com: 5671"
+RABBIT_MQ_URL = "b-016e9376-e18e-4687-89de-f428b88335e2.mq.eu-west-3.amazonaws.com:5671"
 RABBIT_MQ_USERNAME = "myuser"
 RABBIT_MQ_PASSWORD = "mypassword2000"
 
 
-INTRUSIONS_API_URL = "http://localhost:8000"
-SITES_MANAGEMENT_API_URL = "http://localhost:8002"
+INTRUSIONS_API_URL = "http://alb-924031478.eu-west-3.elb.amazonaws.com/intrusion-management-api"
+SITES_MANAGEMENT_API_URL = "http://alb-924031478.eu-west-3.elb.amazonaws.com/sites-management-api"
 
 # Kombu Message Consuming Human_Detection_Worker
 
